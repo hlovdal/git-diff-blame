@@ -74,12 +74,12 @@ my $ANSI_RST = $istty ? "[m"   : "";
 my ($pre, $post);
 my $filename;
 while (<$diff>) {
-	if (m{^diff --git ./(.*) ./\1$}) {
+	if (m{^diff --git a/(.*) b/(.*)$} || m{^diff --git ./(.*) ./(.*)$}) {
 		close $pre if defined $pre;
 		close $post if defined $post;
 		print;
 		$prefilename = "./" . $1;
-		$postfilename = "./" . $1;
+		$postfilename = "./" . $2;
 		$delete = $create = 0;
 	} elsif (m{^new file}) {
 		$create = 1;
@@ -87,7 +87,7 @@ while (<$diff>) {
 	} elsif (m{^deleted file}) {
 		$delete = 1;
 		$postfilename = '/dev/null';
-	} elsif (m{^--- $prefilename$}) {
+	} elsif (m{^--- $prefilename\t?$}) {
 		# ignore
 		print;
 	} elsif (m{^\+\+\+ $postfilename$}) {
